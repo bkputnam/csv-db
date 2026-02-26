@@ -34,8 +34,19 @@ cargo clippy
 cargo mutants
 ```
 
+## Architecture
+
+The codebase is split into a library (`src/lib.rs`) and a thin binary (`src/main.rs`).
+
+Core modules:
+- `types` — `DataType` (INT/FLOAT/TEXT/BOOL) and `Value` (the atom of the database). `Value::matches_type` and `Value::is_null` are the key methods.
+- `row` — `Row`: an ordered `Vec<Value>`. Implements `From<IntoIterator<Item=Value>>`.
+- `schema` — `Column` and `Schema`. `Schema::validate_row` is the central validation entry point; it checks column count, type compatibility, and nullability.
+- `error` — `DbError` enum and `Result<T>` alias used throughout.
+
+Planned future modules: `table` (CSV I/O), `database` (multi-table management), `executor` (query execution against the `sqlparser` AST).
+
 ## Notes
 
 - Uses Rust edition 2024 — prefer modern Rust idioms.
-- No external dependencies yet; add them to `Cargo.toml` as needed.
 - The `.gitignore` excludes `mutants.out*/` (cargo-mutants output).
